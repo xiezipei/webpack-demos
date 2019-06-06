@@ -8,7 +8,7 @@ const config = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: './dist/home.html',
+            filename: 'index.html', // 默认在dist目录下
             template: './src/template/index.html'
         })
     ]

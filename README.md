@@ -16,7 +16,9 @@ webpack-cli -v => 3.3.0
 8. [输出](#输出)
 9. [搭建基本的前端开发环境](#搭建基本的前端开发环境)
 10. [关联 HTML](#关联-HTML)
-11. [参考](#参考)
+11. [构建 CSS](#构建-CSS)
+12. [抽离 CSS](#抽离-CSS)
+13. [参考](#参考)
 
 ## 开胃小菜
 
@@ -321,6 +323,151 @@ module.exports = {
 > 示例：[05-webpack-html-template](./05-webpack-html-template/)
 
 > 参考：[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)
+
+## 构建 CSS
+
+CSS 文件也要作为依赖引入到 `index.js` 里面（因为 **Webpack 的一切资源入口是 `index.js`**），所以这里需要配置引入 loader 来解析和处理 CSS 文件。
+
+安装依赖：
+
+```shell
+npm install --save-dev webpack webpack-cli html-webpack-plugin css-loader style-loader
+```
+
+修改配置文件 `webpack.config.js`：
+
+```js
+module.exports = {
+    // ...
+    module: {
+        rules: [
+            {
+                test: /\.css/,
+                include: [
+                    path.resolve(__dirname, 'src'),
+                ],
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            }
+        ]
+    }
+}
+```
+
+在 `index.js` 引用：
+
+```js
+import './assets/index.css'
+```
+
+特别说明：
+
+* `css-loader`：解析 CSS 代码，处理 CSS 文件中的依赖（如 `@import`、`url()` 等引用外部文件的声明；
+* `style-loader`：会将 `css-loader` 解析的结果转变为 JS 代码，运行时动态插入 `style` 标签来让 CSS 代码生效；
+* 在 `dist/` 看不到 CSS 文件是因为经过两个 loader 处理后，CSS 代码转变为 JS，和 `index.js` 一起打包了；
+* 一般项目中，我们最好把 CSS 分离出来，详见下一节。
+
+> 示例：[06-webpack-css](./06-webpack-css/)
+
+
+## 抽离 CSS
+
+> `extract-text-webpack-plugin` 已经不用于 Webpack V4，[官方文档](https://webpack.js.org/plugins/mini-css-extract-plugin/#root) 推荐使用 [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)。
+
+我们可以通过 `mini-css-extract-plugin` 来抽离 CSS 文件。
+
+```shell
+npm install --save-dev mini-css-extract-plugin
+```
+
+修改配置文件：
+
+```js
+module.exports = {
+    // ...
+    plugins: [
+        // ...
+        new MiniCSSExtractPlugin({  // 分离css文件
+            filename: 'bundle.[hash].css',  // 生成后的文件名
+            chunkFilename: '[id].[hash].css'
+        })
+    ],
+    module: {
+        // ...
+        rules: [
+            {
+                test: /\.css/,
+                include: [
+                    pathResolve('src')
+                ],
+                use: [
+                    {
+                        loader: MiniCSSExtractPlugin.loader,
+                        options: {
+                            publicPath: pathResolve('dist')
+                        }
+                    },
+                    'css-loader'
+                ]
+            }
+        ]
+    }
+}
+```
+
+> 示例：[07-webpack-css-extract](./06-webpack-css-extract/)
+
+
+## CSS 预处理器
+
+除了安装基本依赖：
+
+```shell
+npm install --save-dev webpack webpack-cli
+npm install --save-dev html-webpack-plugin mini-css-extract-plugin
+npm install --save style-loader css-loader
+```
+
+需要额外安装两个东西：
+
+```shell
+npm install --save-dev sass-loader node-sass
+```
+
+然后基于 07 的 `webpack.config.js` 修改配置文件：
+
+```js
+module: {
+    rules: [{
+        test: /\.scss$/,
+        include: pathResolve('src'),
+        use: [
+            // 1、不抽离出来（打包进去index.js）
+            // 'style-loader',
+
+            // 2、抽离出来（独立一个css文件）
+            MiniCSSExtractPlugin.loader, 
+
+            // 3、根据环境判断
+            // process.env.NODE_ENV !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader,
+            
+            'css-loader',
+            'sass-loader'
+        ]
+    }]
+}
+```
+
+执行命令 `npm start` 就完事了。
+
+> 示例：[08-webpack-css-preprocessor](./08-webpack-css-preprocessor/)
+
+## 处理图片
+
+<!-- todo -->
+
 
 ## 参考
 
