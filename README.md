@@ -1,6 +1,24 @@
 # ogg-webpack
 
-## 0. 开胃小菜
+```
+webpack -v => 4.30.0
+webpack-cli -v => 3.3.0
+```
+## 目录
+
+1. [开胃小菜](#开胃小菜)
+2. [无配置文件](#无配置文件)
+3. [简单的配置文件](#简单的配置文件)
+4. [webpack with babel](#webpack-with-babel)
+5. [入口](#入口)
+6. [Loader](#loader)
+7. [Plugin](#plugin)
+8. [输出](#输出)
+9. [搭建基本的前端开发环境](#搭建基本的前端开发环境)
+10. [关联 HTML](#关联-HTML)
+11. [参考](#参考)
+
+## 开胃小菜
 
 1. [What does webpack do?](./doc/what-does-webpack-do.md)
 2. [Your first webpack project](./doc/your-first-webpack-project.md)
@@ -10,7 +28,7 @@
 
 > 来源：[https://blog.jakoblind.no/babel-webpack-es6/](https://blog.jakoblind.no/babel-webpack-es6/)
 
-## 1. 无配置文件 `hello world`
+## 无配置文件
 
 1、安装依赖
 
@@ -24,6 +42,11 @@ npm install --save-dev webpack webpack-cli
 ```shell
 mkdir src
 touch index.js
+```
+
+```js
+// index.js
+console.log("hello world!");
 ```
 
 3、修改 `package.json`
@@ -40,9 +63,11 @@ touch index.js
 npm start
 ```
 
-> 示例：01-no-config
+> Result：生成 `dist` 目录，里面存放 webpack构建好的 `main.js` 文件。
 
-## 2. 简单的配置文件
+> 示例：[01-no-config](./01-no-config/)
+
+## 简单的配置文件
 
 1、新建配置文件 `webpack.config.js`：
 
@@ -87,9 +112,9 @@ npm run dev
 npm run prod
 ```
 
-> 示例：02-simple-config
+> 示例：[02-simple-config](./02-simple-config/)
 
-## 3. Webpack with Babel
+## Webpack with Babel
 
 1、安装 Babel 依赖：
 
@@ -126,4 +151,177 @@ const hello = () => {
 hello();
 ```
 
-> 示例：03-webpack-babel
+> 示例：[03-webpack-babel](./03-webpack-babel/)
+
+## 入口
+
+> 多个代码模块汇总会有一个起始的 `.js` 文件，这个就是 Webpack 构建入口。Webpack 会读取这个文件，并从它开始解析依赖，然后进行打包。默认入口文件为 `./src/index.js`。如果是单页面应用，那么可能入口只有一个；如果是多个页面的项目，那么经常是一个页面对应一个构建入口。
+
+```js
+module.exports = {
+    entry: './src/index.js'
+}
+
+// 上述配置等同于
+module.exports = {
+    entry: {
+        main: './src/index.js'
+    }
+}
+
+// 配置多个入口
+module.exports = {
+    entry: {
+        foo: './src/page-foo.js',
+        bar: './src/page-bar.js',
+        // ...
+    }
+}
+
+// 使用数组对多个文件进行打包
+module.exports = {
+    entry: {
+        main: [
+            './src/foo.js',
+            './src/bar.js'
+        ]
+    }
+}
+```
+
+## loader
+
+> Webpack 中提供一种处理多文件格式的机制——`loader`。可以把 `loader` 理解为一个转换器，负责把某种文件格式的内容转化成 Webpack 可以支持打包的模块。`loader` 是 Webpack 中比较复杂的的一块内容，它支撑 Webpack 来处理文件的多样性。
+
+```js
+module: {
+    // ...
+    rules: [
+        {
+            test: /\.jsx?/, // 匹配文件路径的正则表达式，通常匹配文件类型后缀
+            include: [
+                path.resolve(__dirname, 'src')  // 指定路径下的文件
+            ],
+            use: 'babel-loader',    // 指定使用的 loader
+        }
+    ]
+}
+```
+
+## plugin
+
+> Webpack 构建流程中：模块代码转换的工作由 `loader` 来处理，除此之外的其他任何工作都可以交由 `plugin` 来完成。`plugin` 理论上可以干涉 Webpack 整个构建流程，可以在流程的每一个步骤中定制自己的构建需求。
+
+```js
+// 如果使用 `--mode production`，Webpack 默认会压缩 JS 代码而不必使用下面插件
+const UglifyPlugin = require('uglifyjs-webpack-plugin');
+
+module.exports = {
+    plugins: [
+        new UglifyPlugin()  // 压缩JS代码
+    ]
+}
+```
+
+## 输出
+
+> Webpack 的输出指最终构建出来的静态文件，使用 `output` 字段配置（可以配置文件名、路径等）。
+
+```js
+module.exports = {
+    // ...
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bundle.js',
+    },
+}
+
+// 多个入口生成不同的文件
+module.exports = {
+    entry: {
+        foo: './src/foo.js',
+        bar: './src/bar.js',
+    },
+    output: {
+        filename: '[name].js',
+        path: __dirname + '/dist',
+    },
+}
+
+// 路径中使用 hash，每次构建时会有一个不同 hash 值，避免发布新版本时会使用浏览器缓存
+module.exports = {
+    // ...
+    output: {
+        filename: '[name].js',
+        path: __dirname + '/dist/[hash]',
+    },
+}
+```
+
+## 搭建基本的前端开发环境
+
+基本的前端开发环境需求：
+
+* 构建需要的 HTML、CSS、JS 文件
+* 使用 CSS 预处理器来编写样式
+* 处理和压缩图片
+* 使用 Babel 来支持 ES 新特性
+* 本地提供静态服务以方便开发调试
+
+## 关联 HTML
+
+Webpack 的默认入口是从一个 `.js` 开始，而一个前端项目使从一个 `.html` 开始。为了让 Webpack 关联 HTML，一般是创建一个 `.html` 文件，然后用 `script` 标签直接引用：
+
+```html
+<script src="./dist/bundle.js"></script>
+```
+
+那么问题来了，如果构建生成的 `.js` 文件名发生变化呢（例如使用了 `[hash]` 来进行命令）？所以，最好方法是将 HTML 引用路径和我们构建结果关联起来——具体实现就是通过使用 `html-webpack-plugin`：
+
+```shell
+npm install --save-dev html-webpack-plugin
+```
+
+将该 plugin 加入 plugins 列表：
+
+```js
+// webpack.config.js
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const config = {
+    entry: './src/index.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        // filename: 'bundle.js'
+        filename: [hash].js
+    },
+    plugins: [
+        new HtmlWebpackPlugin(),    // there!
+    ]
+}
+module.exports = config
+```
+
+> 示例：[04-webpack-html](./04-webpack-html/)
+
+但是，用 `html-webpack-plugin` 默认创建的 HTML 文件对我们实际项目并没有什么作用，所以我们一般会通过 `html-webpack-plugin` 的配置，传递一个写好的 HTML 模板：
+
+```js
+module.exports = {
+    // ...
+    plugins: [
+        new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'assets/index.html'
+        })
+    ]
+}
+```
+
+> 示例：[05-webpack-html-template](./05-webpack-html-template/)
+
+> 参考：[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)
+
+## 参考
+
+* [使用 Webpack 定制前端开发环境](https://juejin.im/book/5a6abad5518825733c144469/)
