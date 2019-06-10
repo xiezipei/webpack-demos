@@ -18,7 +18,9 @@ webpack-cli -v => 3.3.0
 10. [关联 HTML](#关联-HTML)
 11. [构建 CSS](#构建-CSS)
 12. [抽离 CSS](#抽离-CSS)
-13. [参考](#参考)
+13. [CSS 预处理器](#CSS-预处理器)
+14. [图片处理](#图片处理)
+15. [参考](#参考)
 
 ## 开胃小菜
 
@@ -464,7 +466,7 @@ module: {
 
 > 示例：[08-webpack-css-preprocessor](./08-webpack-css-preprocessor/)
 
-## 处理图片
+## 图片处理
 
 <!-- todo -->
 
