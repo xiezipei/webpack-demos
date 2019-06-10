@@ -20,7 +20,9 @@ webpack-cli -v => 3.3.0
 12. [抽离 CSS](#抽离-CSS)
 13. [CSS 预处理器](#CSS-预处理器)
 14. [图片处理](#图片处理)
-15. [参考](#参考)
+15. [使用 Babel](#使用-Babel)
+16. [清理目录与启用静态服务器](#清理目录与启用静态服务器)
+17. [参考](#参考)
 
 ## 开胃小菜
 
@@ -159,7 +161,7 @@ hello();
 
 ## 入口
 
-> 多个代码模块汇总会有一个起始的 `.js` 文件，这个就是 Webpack 构建入口。Webpack 会读取这个文件，并从它开始解析依赖，然后进行打包。默认入口文件为 `./src/index.js`。如果是单页面应用，那么可能入口只有一个；如果是多个页面的项目，那么经常是一个页面对应一个构建入口。
+多个代码模块汇总会有一个起始的 `.js` 文件，这个就是 Webpack 构建入口。Webpack 会读取这个文件，并从它开始解析依赖，然后进行打包。默认入口文件为 `./src/index.js`。如果是单页面应用，那么可能入口只有一个；如果是多个页面的项目，那么经常是一个页面对应一个构建入口。
 
 ```js
 module.exports = {
@@ -195,7 +197,7 @@ module.exports = {
 
 ## loader
 
-> Webpack 中提供一种处理多文件格式的机制——`loader`。可以把 `loader` 理解为一个转换器，负责把某种文件格式的内容转化成 Webpack 可以支持打包的模块。`loader` 是 Webpack 中比较复杂的的一块内容，它支撑 Webpack 来处理文件的多样性。
+Webpack 中提供一种处理多文件格式的机制——`loader`。可以把 `loader` 理解为一个转换器，负责把某种文件格式的内容转化成 Webpack 可以支持打包的模块。`loader` 是 Webpack 中比较复杂的的一块内容，它支撑 Webpack 来处理文件的多样性。
 
 ```js
 module: {
@@ -214,7 +216,7 @@ module: {
 
 ## plugin
 
-> Webpack 构建流程中：模块代码转换的工作由 `loader` 来处理，除此之外的其他任何工作都可以交由 `plugin` 来完成。`plugin` 理论上可以干涉 Webpack 整个构建流程，可以在流程的每一个步骤中定制自己的构建需求。
+Webpack 构建流程中：模块代码转换的工作由 `loader` 来处理，除此之外的其他任何工作都可以交由 `plugin` 来完成。`plugin` 理论上可以干涉 Webpack 整个构建流程，可以在流程的每一个步骤中定制自己的构建需求。
 
 ```js
 // 如果使用 `--mode production`，Webpack 默认会压缩 JS 代码而不必使用下面插件
@@ -229,7 +231,7 @@ module.exports = {
 
 ## 输出
 
-> Webpack 的输出指最终构建出来的静态文件，使用 `output` 字段配置（可以配置文件名、路径等）。
+Webpack 的输出指最终构建出来的静态文件，使用 `output` 字段配置（可以配置文件名、路径等）。
 
 ```js
 module.exports = {
@@ -468,7 +470,86 @@ module: {
 
 ## 图片处理
 
-<!-- todo -->
+由于图片对应的 jpg/png/git 等文件格式，Webpack 处理不了，所以我们需要添加一个处理图片的 loader 配置—— `file-loader`。file-loader 可以用于处理很多类型的文件，它的主要作用是直接输出文件，把构建后的文件路径返回。
+
+```js
+module: {
+    rules: [
+        // ...
+        {
+            test: /\.(png|jpg|gif)$/,
+            use: [
+                {
+                    loader: 'file-loader',
+                    options: {}
+                }
+            ]
+        }
+    ]
+}
+```
+
+> 示例：[09-webpack-image](./09-webpack-image/)
+
+## 使用 Babel
+
+Babel 是一个让我们能够使用 ES 新特性的 JS 编译工具。在 Webpack 中配置 Babel，就可以使用 ES6、ES7 标准来编写 JS 代码。
+
+```js
+module.exports = {
+  // ...
+  module: {
+    rules: [
+      {
+        test: /\.jsx?/, // 支持 js 和 jsx
+        include: [
+          path.resolve(__dirname, 'src'), 
+        ],
+        loader: 'babel-loader',
+      },
+    ],
+  },
+}
+```
+
+> 示例：[10-webpack-babel-new](./10-webpack-babel-new/)
+
+## 清理目录与启用静态服务器
+
+由于用了 `hash` 命名资源文件，所以每次构建打包都不会替换原来的文件，这里我们就需要用到 `clean-webpack-plugin` 来清理目录：
+
+```shell
+npm install --save-dev clean-webpack-plugin
+```
+
+```js
+// ...
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+// ...
+plugins: [
+    new CleanWebpackPlugin(),   // 放在前面
+    // ...
+]
+```
+
+为了方便调试，我们还会使用 `webpack-dev-server` 在本地开启一个简单的静态服务器来进行开发：
+
+```shell
+npm install --save-dev webpack-dev-server
+```
+
+```json
+"script": {
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development"
+}
+```
+> 注意：webpack-dev-server 默认调用 8080 端口，即访问地址：http://localhost:8080/
+
+> 示例：[10-webpack-babel-new](./10-webpack-babel-new/)
+
+
 
 
 ## 参考
