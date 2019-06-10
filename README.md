@@ -22,7 +22,7 @@ webpack-cli -v => 3.3.0
 14. [图片处理](#图片处理)
 15. [使用 Babel](#使用-Babel)
 16. [清理目录与启用静态服务器](#清理目录与启用静态服务器)
-17. [参考](#参考)
+18. [参考](#参考)
 
 ## 开胃小菜
 
@@ -273,6 +273,8 @@ module.exports = {
 * 处理和压缩图片
 * 使用 Babel 来支持 ES 新特性
 * 本地提供静态服务以方便开发调试
+
+先了解大概需求，下面再一步步实现。👇
 
 ## 关联 HTML
 
@@ -549,9 +551,14 @@ npm install --save-dev webpack-dev-server
 
 > 示例：[10-webpack-babel-new](./10-webpack-babel-new/)
 
-
-
-
 ## 参考
 
 * [使用 Webpack 定制前端开发环境](https://juejin.im/book/5a6abad5518825733c144469/)
+* [Webpack 系列之一总览](https://juejin.im/post/5bf7c2186fb9a049fd0f7e8a)
+* [Webpack 系列之二 Tapable](https://juejin.im/post/5c25f920e51d45593b4bc719)
+* [Webpack 系列之三 resolve](https://juejin.im/post/5c6b78cdf265da2da15db125)
+* [Webpack 系列之四 loader 详解 1](https://juejin.im/post/5c6e6efee51d45012d06907d)
+* [Webpack 系列之四 loader 详解 2](https://juejin.im/post/5c6e70f5e51d4572b24b430d)
+* [Webpack 系列之四 loader 详解 3](https://juejin.im/post/5c6e7173e51d4575b43af611)
+* [Webpack 系列之五 module 生成 1](https://juejin.im/post/5cc125a05188252e8544aaf8)
+* [Webpack 系列之五 module 生成 2](https://juejin.im/post/5cc51b79518825250c76aac0)
