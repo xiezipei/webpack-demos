@@ -22,6 +22,7 @@ webpack-cli -v => 3.3.0
 14. [图片处理](#图片处理)
 15. [使用 Babel](#使用-Babel)
 16. [清理目录与启用静态服务器](#清理目录与启用静态服务器)
+17. [Vue 编译配置](#Vue-编译配置)
 18. [参考](#参考)
 
 ## 开胃小菜
@@ -550,6 +551,12 @@ npm install --save-dev webpack-dev-server
 > 注意：webpack-dev-server 默认调用 8080 端口，即访问地址：http://localhost:8080/
 
 > 示例：[10-webpack-babel-new](./10-webpack-babel-new/)
+
+
+## Vue 编译配置
+
+👉[12-webpack-vue-template](./12-webpack-vue-template/README.md)
+
 
 ## 参考
 

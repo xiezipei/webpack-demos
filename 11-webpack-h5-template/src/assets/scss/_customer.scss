@@ -1,0 +1,18 @@
+:root {
+    --red: #d33;
+}
+
+h1 {
+    color: var(--red);
+    display: flex;
+}
+
+body {
+    background: url(../images/bg.png) repeat center;
+    background-color: aquamarine;
+
+    p {
+        // font-size: 32px;
+        color: blueviolet;
+    }
+}
